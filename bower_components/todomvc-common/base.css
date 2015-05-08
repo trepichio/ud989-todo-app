@@ -110,6 +110,43 @@ input[type="checkbox"] {
 	border-top-right-radius: 1px;
 }
 
+.main-btn {
+  -webkit-appearance: none;
+  line-height: 43px;
+  font-size: 24px;
+  color: #d9d9d9;
+  text-shadow: 0 -1px 0 #bfbfbf;
+  position: absolute;
+  top: 20px;
+  left: 90%;
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  -o-appearance: none;
+  appearance: none;
+  z-index: 2;
+}
+
+#save {
+	left: 95%;
+}
+
+#save:active {
+	color: #d66;
+	text-shadow: 0 1px 0 #669991;
+}
+
+#priority:checked:after {
+	color: green;
+	text-shadow: 0 1px 0 #669991;
+	bottom: 1px;
+	position: relative;
+}
+
+#priority:after {
+	content: '!';
+}
+
+
 #new-todo,
 .edit {
 	position: relative;

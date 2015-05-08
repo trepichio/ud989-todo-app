@@ -20,6 +20,7 @@ var app = app || {};
 		// Delegated events for creating new items, and clearing completed ones.
 		events: {
 			'keypress #new-todo': 'createOnEnter',
+			'click #save': 'createOnSave',
 			'click #clear-completed': 'clearCompleted',
 			'click #toggle-all': 'toggleAllComplete'
 		},
@@ -33,6 +34,7 @@ var app = app || {};
 			this.$footer = this.$('#footer');
 			this.$main = this.$('#main');
 			this.$list = $('#todo-list');
+			this.$priority = document.querySelector("#priority");
 
 			this.listenTo(app.todos, 'add', this.addOne);
 			this.listenTo(app.todos, 'reset', this.addAll);
@@ -99,7 +101,8 @@ var app = app || {};
 			return {
 				title: this.$input.val().trim(),
 				order: app.todos.nextOrder(),
-				completed: false
+				completed: false,
+				prioritized: this.$priority.checked
 			};
 		},
 
@@ -109,6 +112,18 @@ var app = app || {};
 			if (e.which === ENTER_KEY && this.$input.val().trim()) {
 				app.todos.create(this.newAttributes());
 				this.$input.val('');
+				this.$priority.checked = false;
+			}
+		},
+
+		// If you click save button next to the main input field, 
+		// create new **Todo** model 
+		// persisting it to *localStorage* if input is filled
+		createOnSave: function (e) {
+			if (this.$input.val().trim()) {
+				app.todos.create(this.newAttributes());
+				this.$input.val('');
+				this.$priority.checked = false;
 			}
 		},
 
