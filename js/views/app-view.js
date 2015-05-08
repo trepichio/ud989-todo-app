@@ -53,6 +53,7 @@ var app = app || {};
 		render: function () {
 			var completed = app.todos.completed().length;
 			var remaining = app.todos.remaining().length;
+			var priorities = app.todos.priorities().length;
 
 			if (app.todos.length) {
 				this.$main.show();
@@ -60,7 +61,8 @@ var app = app || {};
 
 				this.$footer.html(this.statsTemplate({
 					completed: completed,
-					remaining: remaining
+					remaining: remaining,
+					priorities: priorities
 				}));
 
 				this.$('#filters li a')

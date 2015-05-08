@@ -49,7 +49,7 @@ var app = app || {};
 			if (this.model.changed.id !== undefined) {
 				return;
 			}
-
+			
 			this.$el.html(this.template(this.model.toJSON()));
 			this.$el.toggleClass('completed', this.model.get('completed'));
 			this.$el.toggleClass('priority', this.model.get('prioritized'));
@@ -64,8 +64,12 @@ var app = app || {};
 
 		isHidden: function () {
 			return this.model.get('completed') ?
-				app.TodoFilter === 'active' :
-				app.TodoFilter === 'completed';
+				app.TodoFilter === 'active' || 
+				app.TodoFilter === 'priorities' :
+				!this.model.get('prioritized') ?
+					app.TodoFilter === 'priorities' || 
+					app.TodoFilter === 'completed':
+					app.TodoFilter === 'completed';
 		},
 
 		// Toggle the `"completed"` state of the model.
