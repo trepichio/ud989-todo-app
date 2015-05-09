@@ -35,6 +35,9 @@ var app = app || {};
 			this.listenTo(this.model, 'change', this.render);
 			this.listenTo(this.model, 'destroy', this.remove);
 			this.listenTo(this.model, 'visible', this.toggleVisible);
+			this.x = this.random_number(0,255), 
+			this.y = this.random_number(0,255),
+			this.z = this.random_number(0,255);
 		},
 
 		// Re-render the titles of the todo item.
@@ -49,15 +52,13 @@ var app = app || {};
 			if (this.model.changed.id !== undefined) {
 				return;
 			}
-			var x = this.random_number(0,255), 
-			y = this.random_number(0,255),
-			z = this.random_number(0,255);
+			
 			this.$el.html(this.template(this.model.toJSON()));
 			this.$el.toggleClass('completed', this.model.get('completed'));
 			this.$el.toggleClass('priority', this.model.get('prioritized'));
 			this.$el.css(
 				"background-color",
-				"rgba("+ x +","+ y +","+ z +", 0.2)"
+				"rgba("+ this.x +","+ this.y +","+ this.z +", 0.2)"
 				);
 			this.toggleVisible();
 			this.$input = this.$('.edit');

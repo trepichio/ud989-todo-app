@@ -268,7 +268,7 @@ label[for='toggle-all'] {
 	bottom: 0;
 	left: 34px;
 	padding: 0 4px;
-	background-color: #fcfcfc;
+/*	background-color: #fcfcfc;*/
 	/*color: #d00;*/
 	z-index: 10;
 	/* Mobile Safari */
@@ -277,6 +277,7 @@ label[for='toggle-all'] {
 	-ms-appearance: none;
 	-o-appearance: none;
 	appearance: none;
+	font-size: 1.5em;
 }
 
 #todo-list li:hover .priority-btn {
