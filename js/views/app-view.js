@@ -22,7 +22,8 @@ var app = app || {};
 			'keypress #new-todo': 'createOnEnter',
 			'click #save': 'createOnSave',
 			'click #clear-completed': 'clearCompleted',
-			'click #toggle-all': 'toggleAllComplete'
+			'click #toggle-all': 'toggleAllComplete',
+			'change #priority': 'togglePriority'
 		},
 
 		// At initialization we bind to the relevant events on the `Todos`
@@ -114,6 +115,7 @@ var app = app || {};
 			if (e.which === ENTER_KEY && this.$input.val().trim()) {
 				app.todos.create(this.newAttributes());
 				this.$input.val('');
+				this.$input.removeClass('prioritized');
 				this.$priority.checked = false;
 			}
 		},
@@ -125,6 +127,7 @@ var app = app || {};
 			if (this.$input.val().trim()) {
 				app.todos.create(this.newAttributes());
 				this.$input.val('');
+				this.$input.removeClass('prioritized');
 				this.$priority.checked = false;
 			}
 		},
@@ -143,6 +146,11 @@ var app = app || {};
 					completed: completed
 				});
 			});
+		},
+
+		togglePriority: function () {
+			this.$input.toggleClass('prioritized');
 		}
+
 	});
 })(jQuery);

@@ -126,6 +126,10 @@ input[type="checkbox"] {
   z-index: 2;
 }
 
+.prioritized {
+	color: #d66 !important;
+}
+
 #save {
 	left: 95%;
 }
