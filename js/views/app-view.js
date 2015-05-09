@@ -34,7 +34,7 @@ var app = app || {};
 			this.$footer = this.$('#footer');
 			this.$main = this.$('#main');
 			this.$list = $('#todo-list');
-			this.$priority = document.querySelector("#priority");
+			this.$priority = this.$("#priority")[0];
 
 			this.listenTo(app.todos, 'add', this.addOne);
 			this.listenTo(app.todos, 'reset', this.addAll);
