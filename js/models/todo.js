@@ -14,7 +14,8 @@ var app = app || {};
 		defaults: {
 			title: '',
 			completed: false,
-			prioritized: false
+			prioritized: false,
+			priority_level: 0
 		},
 
 		// Toggle the `completed` state of this todo item.
@@ -26,9 +27,25 @@ var app = app || {};
 
 		// Toggle the `prioritized` state of this todo item.
 		togglePriority: function () {
-			this.save({
-				prioritized: !this.get('prioritized')
-			});
+			if ( this.get('prioritized') ){
+				if ( this.get( 'priority_level') < 3) {
+					this.save({
+						priority_level: this.get('priority_level') + 1
+					});
+				}
+				else {
+					this.save({
+						prioritized: !this.get('prioritized'),
+						priority_level: 0
+					});
+				} 
+			} else{
+				this.save({
+					prioritized: !this.get('prioritized')
+				});
+			}
+
+			
 		}
 	});
 })();
