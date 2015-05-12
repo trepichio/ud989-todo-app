@@ -10,12 +10,13 @@
 			<header id="header">
 				<h1>todos</h1>
 				<input id="new-todo" placeholder="What needs to be done?" autofocus>
-				<input id="priority" class="main-btn" type="checkbox">
-				<button id="save" class="main-btn">✔</button>
+				<input id="priority" type="checkbox"><label for="priority" class="main-btn"><div></div></label>
+				<button id="save" class="main-btn"></button>
 			</header>
 			<section id="main">
 				<input id="toggle-all" type="checkbox">
-				<label for="toggle-all">Mark all as complete</label>
+				<div></div>
+				<label for="toggle-all">Mark all as complete </label>
 				<ul id="todo-list"></ul>
 			</section>
 			<footer id="footer"></footer>
@@ -28,6 +29,7 @@
 		<script type="text/template" id="item-template">
 			<div class="view">
 				<input class="toggle" type="checkbox" <%= completed ? 'checked' : '' %>>
+				<span class="toggle"></span>
 				<label><%- title %><%= completed ? ' --done!' : '' %> <%= prioritized && !completed ? ' Priority #' + priority_level : '' %></label>
 				<button class="priority-btn"></button>
 				<button class="edit-btn"></button>
