@@ -62,6 +62,7 @@ var app = app || {};
 			var completed = app.todos.completed().length;
 			var remaining = app.todos.remaining().length;
 			var priorities = app.todos.priorities().length;
+			var deleted = app.deletedTodos.trash().length;
 
 			if (app.todos.length || app.deletedTodos.length) {
 				this.$main.show();
@@ -70,7 +71,8 @@ var app = app || {};
 				this.$footer.html(this.statsTemplate({
 					completed: completed,
 					remaining: remaining,
-					priorities: priorities
+					priorities: priorities,
+					deleted: deleted
 				}));
 
 				this.$('#filters li a')
