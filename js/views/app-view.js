@@ -20,8 +20,10 @@ var app = app || {};
 		// Delegated events for creating new items, and clearing completed ones.
 		events: {
 			'keypress #new-todo': 'createOnEnter',
+			'click #save': 'createOnSave',
 			'click #clear-completed': 'clearCompleted',
-			'click #toggle-all': 'toggleAllComplete'
+			'click #toggle-all': 'toggleAllComplete',
+			'change #priority': 'togglePriority'
 		},
 
 		// At initialization we bind to the relevant events on the `Todos`
@@ -33,17 +35,25 @@ var app = app || {};
 			this.$footer = this.$('#footer');
 			this.$main = this.$('#main');
 			this.$list = $('#todo-list');
+			this.$priority = this.$("#priority")[0];
 
 			this.listenTo(app.todos, 'add', this.addOne);
 			this.listenTo(app.todos, 'reset', this.addAll);
+			this.listenTo(app.deletedTodos, 'add', this.addOne);
+			this.listenTo(app.deletedTodos, 'reset', this.addAllDeleted);
 			this.listenTo(app.todos, 'change:completed', this.filterOne);
 			this.listenTo(app.todos, 'filter', this.filterAll);
+			this.listenTo(app.deletedTodos, 'filter', this.filterAllDeleted);
 			this.listenTo(app.todos, 'all', this.render);
+			this.listenTo(app.deletedTodos, 'all', this.render);
 
 			// Suppresses 'add' events with {reset: true} and prevents the app view
 			// from being re-rendered for every model. Only renders when the 'reset'
 			// event is triggered at the end of the fetch.
-			app.todos.fetch({reset: true});
+			// app.todos.fetch({reset: true});
+
+			//fetch both collections when loading page
+			_.invoke([app.todos, app.deletedTodos], 'fetch');
 		},
 
 		// Re-rendering the App just means refreshing the statistics -- the rest
@@ -51,14 +61,18 @@ var app = app || {};
 		render: function () {
 			var completed = app.todos.completed().length;
 			var remaining = app.todos.remaining().length;
+			var priorities = app.todos.priorities().length;
+			var deleted = app.deletedTodos.trash().length;
 
-			if (app.todos.length) {
+			if (app.todos.length || app.deletedTodos.length) {
 				this.$main.show();
 				this.$footer.show();
 
 				this.$footer.html(this.statsTemplate({
 					completed: completed,
-					remaining: remaining
+					remaining: remaining,
+					priorities: priorities,
+					deleted: deleted
 				}));
 
 				this.$('#filters li a')
@@ -71,6 +85,12 @@ var app = app || {};
 			}
 
 			this.allCheckbox.checked = !remaining;
+
+			// when viewing the recycle bin user shouldn't be able
+			// to check all items completed at all
+			// and it's good even to avoid letting CSS applies
+			// style for it.
+			app.TodoFilter === 'trash' ? this.allCheckbox.disabled = true : this.allCheckbox.disabled = false;
 		},
 
 		// Add a single todo item to the list by creating a view for it, and
@@ -86,6 +106,12 @@ var app = app || {};
 			app.todos.each(this.addOne, this);
 		},
 
+		// Add all items in the **deletedTodos** collection at once.
+		addAllDeleted: function () {
+			this.$list.html('');
+			app.deletedTodos.each(this.addOne, this);
+		},
+		
 		filterOne: function (todo) {
 			todo.trigger('visible');
 		},
@@ -94,12 +120,17 @@ var app = app || {};
 			app.todos.each(this.filterOne, this);
 		},
 
+		filterAllDeleted: function () {
+			app.deletedTodos.each(this.filterOne, this);
+		},
+
 		// Generate the attributes for a new Todo item.
 		newAttributes: function () {
 			return {
 				title: this.$input.val().trim(),
 				order: app.todos.nextOrder(),
-				completed: false
+				completed: false,
+				prioritized: this.$priority.checked
 			};
 		},
 
@@ -109,6 +140,20 @@ var app = app || {};
 			if (e.which === ENTER_KEY && this.$input.val().trim()) {
 				app.todos.create(this.newAttributes());
 				this.$input.val('');
+				this.$input.removeClass('prioritized');
+				this.$priority.checked = false;
+			}
+		},
+
+		// If you click save button next to the main input field, 
+		// create new **Todo** model 
+		// persisting it to *localStorage* if input is filled
+		createOnSave: function (e) {
+			if (this.$input.val().trim()) {
+				app.todos.create(this.newAttributes());
+				this.$input.val('');
+				this.$input.removeClass('prioritized');
+				this.$priority.checked = false;
 			}
 		},
 
@@ -126,6 +171,11 @@ var app = app || {};
 					completed: completed
 				});
 			});
+		},
+
+		togglePriority: function () {
+			this.$input.toggleClass('prioritized');
 		}
+
 	});
 })(jQuery);

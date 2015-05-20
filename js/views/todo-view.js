@@ -19,10 +19,13 @@ var app = app || {};
 		events: {
 			'click .toggle': 'toggleCompleted',
 			'dblclick label': 'edit',
+			'click .edit-btn' : 'edit',
 			'click .destroy': 'clear',
+			'click .priority-btn' : 'togglePrioritized',
 			'keypress .edit': 'updateOnEnter',
 			'keydown .edit': 'revertOnEscape',
-			'blur .edit': 'close'
+			'blur .edit': 'close',
+			'click .recover-btn' : 'recover'
 		},
 
 		// The TodoView listens for changes to its model, re-rendering. Since
@@ -32,7 +35,11 @@ var app = app || {};
 		initialize: function () {
 			this.listenTo(this.model, 'change', this.render);
 			this.listenTo(this.model, 'destroy', this.remove);
+			this.listenTo(this.model, 'destroy', this.addDeleted);
 			this.listenTo(this.model, 'visible', this.toggleVisible);
+			this.x = this.random_number(0,255), 
+			this.y = this.random_number(0,255),
+			this.z = this.random_number(0,255);
 		},
 
 		// Re-render the titles of the todo item.
@@ -47,9 +54,14 @@ var app = app || {};
 			if (this.model.changed.id !== undefined) {
 				return;
 			}
-
+			
 			this.$el.html(this.template(this.model.toJSON()));
 			this.$el.toggleClass('completed', this.model.get('completed'));
+			this.$el.toggleClass('priority', this.model.get('prioritized'));
+			this.$el.css(
+				"background-color",
+				"rgba("+ this.x +","+ this.y +","+ this.z +", 0.2)"
+				);
 			this.toggleVisible();
 			this.$input = this.$('.edit');
 			return this;
@@ -60,20 +72,45 @@ var app = app || {};
 		},
 
 		isHidden: function () {
-			return this.model.get('completed') ?
-				app.TodoFilter === 'active' :
-				app.TodoFilter === 'completed';
+			return this.model.get('deleted') ? 
+				app.TodoFilter === '' ||
+				app.TodoFilter === 'active' || 
+				app.TodoFilter === 'priorities' ||
+				app.TodoFilter === 'completed' : 
+			this.model.get('completed') ?
+				app.TodoFilter === 'active' || 
+				app.TodoFilter === 'priorities' ||
+				app.TodoFilter === 'trash' :
+				!this.model.get('prioritized') ?
+					app.TodoFilter === 'priorities' || 
+					app.TodoFilter === 'completed' || 
+					app.TodoFilter === 'trash' :
+					app.TodoFilter === 'completed' || 
+					app.TodoFilter === 'trash';
 		},
 
 		// Toggle the `"completed"` state of the model.
 		toggleCompleted: function () {
-			this.model.toggle();
+			if (!this.model.get('deleted')){
+				this.model.toggle();
+			}
+		},
+
+		// Toggle the `"prioritized"` state of the model.
+		togglePrioritized: function () {
+			if (!this.model.get('deleted')){
+				if (!this.model.get('completed')){
+					this.model.togglePriority();	
+				}
+			}
 		},
 
 		// Switch this view into `"editing"` mode, displaying the input field.
 		edit: function () {
-			this.$el.addClass('editing');
-			this.$input.focus();
+			if (!this.model.get('deleted')){
+				this.$el.addClass('editing');
+				this.$input.focus();
+			}
 		},
 
 		// Close the `"editing"` mode, saving changes to the todo.
@@ -127,6 +164,30 @@ var app = app || {};
 		// Remove the item, destroy the model from *localStorage* and delete its view.
 		clear: function () {
 			this.model.destroy();
+		},
+
+		addDeleted: function () {
+			if (!this.model.get('deleted')){
+				var trash = _.omit(this.model.attributes,'id','order','deleted');
+				trash.order = app.deletedTodos.nextOrder();
+				app.deletedTodos.create(trash);
+			}	
+		},
+
+		recover: function () {
+			if (this.model.get('deleted')){
+				var recoveredItem = _.omit(this.model.attributes,'id','order','deleted');
+				recoveredItem.order = app.todos.nextOrder();
+				app.todos.create(recoveredItem);
+				this.clear();
+			}	
+		},
+
+		/**
+		 * Returns a random number between min (inclusive) and max (exclusive)
+		 */
+		random_number: function (min, max) {
+		    return parseInt(Math.random() * (max - min) + min);
 		}
 	});
 })(jQuery);
