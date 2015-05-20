@@ -10,10 +10,13 @@
 			<header id="header">
 				<h1>todos</h1>
 				<input id="new-todo" placeholder="What needs to be done?" autofocus>
+				<input id="priority" type="checkbox"><label for="priority" class="main-btn"><div></div></label>
+				<button id="save" class="main-btn"></button>
 			</header>
 			<section id="main">
 				<input id="toggle-all" type="checkbox">
-				<label for="toggle-all">Mark all as complete</label>
+				<div></div>
+				<label for="toggle-all">Mark all as complete </label>
 				<ul id="todo-list"></ul>
 			</section>
 			<footer id="footer"></footer>
@@ -21,12 +24,16 @@
 		<footer id="info">
 			<p>Double-click to edit a todo</p>
 			<p>Written by <a href="https://github.com/addyosmani">Addy Osmani</a></p>
+			<p>Modified by <a href="https://github.com/trepichio">João Eduardo Átala Trepíchio</a></p>
 			<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
 		</footer>
 		<script type="text/template" id="item-template">
 			<div class="view">
 				<input class="toggle" type="checkbox" <%= completed ? 'checked' : '' %>>
-				<label><%- title %></label>
+				<span class="toggle"></span>
+				<label><%- title %><%= completed ? ' --done!' : '' %> <%= prioritized && !completed ? ' Priority #' + priority_level : '' %></label>
+				<button class="priority-btn"></button>
+				<button class=<%= deleted ? "recover-btn" : "edit-btn" %>></button>
 				<button class="destroy"></button>
 			</div>
 			<input class="edit" value="<%- title %>">
@@ -43,6 +50,15 @@
 				<li>
 					<a href="#/completed">Completed</a>
 				</li>
+				<li>
+					<a href="#/priorities">Priority</a>
+				</li>
+				<li>
+					<a href="#/trash" class="trash"></a>
+					<span id="trash-count"><strong><%= deleted %></strong></span>
+				</li>
+				
+				
 			</ul>
 			<% if (completed) { %>
 			<button id="clear-completed">Clear completed (<%= completed %>)</button>
@@ -53,6 +69,8 @@
 		<script src="bower_components/underscore/underscore.js"></script>
 		<script src="bower_components/backbone/backbone.js"></script>
 		<script src="bower_components/backbone.localStorage/backbone.localStorage.js"></script>
+		<script src="js/models/deletedTodo.js"></script>
+		<script src="js/collections/deletedTodos.js"></script>
 		<script src="js/models/todo.js"></script>
 		<script src="js/collections/todos.js"></script>
 		<script src="js/views/todo-view.js"></script>

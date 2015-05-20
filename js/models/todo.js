@@ -13,7 +13,10 @@ var app = app || {};
 		// and ensure that each todo created has `title` and `completed` keys.
 		defaults: {
 			title: '',
-			completed: false
+			completed: false,
+			prioritized: false,
+			priority_level: 0,
+			deleted: false
 		},
 
 		// Toggle the `completed` state of this todo item.
@@ -21,6 +24,27 @@ var app = app || {};
 			this.save({
 				completed: !this.get('completed')
 			});
+		},
+
+		// Toggle the `prioritized` state of this todo item.
+		togglePriority: function () {
+			if ( this.get('prioritized') ){
+				if ( this.get( 'priority_level') < 3) {
+					this.save({
+						priority_level: this.get('priority_level') + 1
+					});
+				}
+				else {
+					this.save({
+						prioritized: !this.get('prioritized'),
+						priority_level: 0
+					});
+				} 
+			} else{
+				this.save({
+					prioritized: !this.get('prioritized')
+				});
+			}		
 		}
 	});
 })();
