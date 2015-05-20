@@ -14,9 +14,10 @@ var app = app || {};
 		setFilter: function (param) {
 			// Set the current filter to be used
 			app.TodoFilter = param || '';
-
+			console.log(app.TodoFilter);
 			// Trigger a collection filter event, causing hiding/unhiding
 			// of Todo view items
+			app.deletedTodos.trigger('filter');
 			app.todos.trigger('filter');
 		}
 	});

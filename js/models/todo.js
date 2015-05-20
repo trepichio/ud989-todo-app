@@ -15,7 +15,8 @@ var app = app || {};
 			title: '',
 			completed: false,
 			prioritized: false,
-			priority_level: 0
+			priority_level: 0,
+			deleted: false
 		},
 
 		// Toggle the `completed` state of this todo item.
@@ -43,9 +44,7 @@ var app = app || {};
 				this.save({
 					prioritized: !this.get('prioritized')
 				});
-			}
-
-			
+			}		
 		}
 	});
 })();

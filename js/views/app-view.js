@@ -39,14 +39,21 @@ var app = app || {};
 
 			this.listenTo(app.todos, 'add', this.addOne);
 			this.listenTo(app.todos, 'reset', this.addAll);
+			this.listenTo(app.deletedTodos, 'add', this.addOne);
+			this.listenTo(app.deletedTodos, 'reset', this.addAllDeleted);
 			this.listenTo(app.todos, 'change:completed', this.filterOne);
 			this.listenTo(app.todos, 'filter', this.filterAll);
+			this.listenTo(app.deletedTodos, 'filter', this.filterAllDeleted);
 			this.listenTo(app.todos, 'all', this.render);
+			this.listenTo(app.deletedTodos, 'all', this.render);
 
 			// Suppresses 'add' events with {reset: true} and prevents the app view
 			// from being re-rendered for every model. Only renders when the 'reset'
 			// event is triggered at the end of the fetch.
-			app.todos.fetch({reset: true});
+			// app.todos.fetch({reset: true});
+
+			//fetch both collections when loading page
+			_.invoke([app.todos, app.deletedTodos], 'fetch');
 		},
 
 		// Re-rendering the App just means refreshing the statistics -- the rest
@@ -56,7 +63,7 @@ var app = app || {};
 			var remaining = app.todos.remaining().length;
 			var priorities = app.todos.priorities().length;
 
-			if (app.todos.length) {
+			if (app.todos.length || app.deletedTodos.length) {
 				this.$main.show();
 				this.$footer.show();
 
@@ -76,6 +83,12 @@ var app = app || {};
 			}
 
 			this.allCheckbox.checked = !remaining;
+
+			// when viewing the recycle bin user shouldn't be able
+			// to check all items completed at all
+			// and it's good even to avoid letting CSS applies
+			// style for it.
+			app.TodoFilter === 'trash' ? this.allCheckbox.disabled = true : this.allCheckbox.disabled = false;
 		},
 
 		// Add a single todo item to the list by creating a view for it, and
@@ -91,12 +104,22 @@ var app = app || {};
 			app.todos.each(this.addOne, this);
 		},
 
+		// Add all items in the **deletedTodos** collection at once.
+		addAllDeleted: function () {
+			this.$list.html('');
+			app.deletedTodos.each(this.addOne, this);
+		},
+		
 		filterOne: function (todo) {
 			todo.trigger('visible');
 		},
 
 		filterAll: function () {
 			app.todos.each(this.filterOne, this);
+		},
+
+		filterAllDeleted: function () {
+			app.deletedTodos.each(this.filterOne, this);
 		},
 
 		// Generate the attributes for a new Todo item.

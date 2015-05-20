@@ -24,7 +24,8 @@ var app = app || {};
 			'click .priority-btn' : 'togglePrioritized',
 			'keypress .edit': 'updateOnEnter',
 			'keydown .edit': 'revertOnEscape',
-			'blur .edit': 'close'
+			'blur .edit': 'close',
+			'click .recover-btn' : 'recover'
 		},
 
 		// The TodoView listens for changes to its model, re-rendering. Since
@@ -34,6 +35,7 @@ var app = app || {};
 		initialize: function () {
 			this.listenTo(this.model, 'change', this.render);
 			this.listenTo(this.model, 'destroy', this.remove);
+			this.listenTo(this.model, 'destroy', this.addDeleted);
 			this.listenTo(this.model, 'visible', this.toggleVisible);
 			this.x = this.random_number(0,255), 
 			this.y = this.random_number(0,255),
@@ -70,31 +72,45 @@ var app = app || {};
 		},
 
 		isHidden: function () {
-			return this.model.get('completed') ?
+			return this.model.get('deleted') ? 
+				app.TodoFilter === '' ||
 				app.TodoFilter === 'active' || 
-				app.TodoFilter === 'priorities' :
+				app.TodoFilter === 'priorities' ||
+				app.TodoFilter === 'completed' : 
+			this.model.get('completed') ?
+				app.TodoFilter === 'active' || 
+				app.TodoFilter === 'priorities' ||
+				app.TodoFilter === 'trash' :
 				!this.model.get('prioritized') ?
 					app.TodoFilter === 'priorities' || 
-					app.TodoFilter === 'completed':
-					app.TodoFilter === 'completed';
+					app.TodoFilter === 'completed' || 
+					app.TodoFilter === 'trash' :
+					app.TodoFilter === 'completed' || 
+					app.TodoFilter === 'trash';
 		},
 
 		// Toggle the `"completed"` state of the model.
 		toggleCompleted: function () {
-			this.model.toggle();
+			if (!this.model.get('deleted')){
+				this.model.toggle();
+			}
 		},
 
 		// Toggle the `"prioritized"` state of the model.
 		togglePrioritized: function () {
-			if (!this.model.get('completed')){
-				this.model.togglePriority();	
+			if (!this.model.get('deleted')){
+				if (!this.model.get('completed')){
+					this.model.togglePriority();	
+				}
 			}
 		},
 
 		// Switch this view into `"editing"` mode, displaying the input field.
 		edit: function () {
-			this.$el.addClass('editing');
-			this.$input.focus();
+			if (!this.model.get('deleted')){
+				this.$el.addClass('editing');
+				this.$input.focus();
+			}
 		},
 
 		// Close the `"editing"` mode, saving changes to the todo.
@@ -148,6 +164,23 @@ var app = app || {};
 		// Remove the item, destroy the model from *localStorage* and delete its view.
 		clear: function () {
 			this.model.destroy();
+		},
+
+		addDeleted: function () {
+			if (!this.model.get('deleted')){
+				var trash = _.omit(this.model.attributes,'id','order','deleted');
+				trash.order = app.deletedTodos.nextOrder();
+				app.deletedTodos.create(trash);
+			}	
+		},
+
+		recover: function () {
+			if (this.model.get('deleted')){
+				var recoveredItem = _.omit(this.model.attributes,'id','order','deleted');
+				recoveredItem.order = app.todos.nextOrder();
+				app.todos.create(recoveredItem);
+				this.clear();
+			}	
 		},
 
 		/**

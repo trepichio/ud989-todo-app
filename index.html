@@ -32,7 +32,7 @@
 				<span class="toggle"></span>
 				<label><%- title %><%= completed ? ' --done!' : '' %> <%= prioritized && !completed ? ' Priority #' + priority_level : '' %></label>
 				<button class="priority-btn"></button>
-				<button class="edit-btn"></button>
+				<button class=<%= deleted ? "recover-btn" : "edit-btn" %>></button>
 				<button class="destroy"></button>
 			</div>
 			<input class="edit" value="<%- title %>">
@@ -52,6 +52,10 @@
 				<li>
 					<a href="#/priorities">Priority</a>
 				</li>
+				<li>
+					<a href="#/trash" class="trash"></a>
+				</li>
+				
 				
 			</ul>
 			<% if (completed) { %>
@@ -63,6 +67,8 @@
 		<script src="bower_components/underscore/underscore.js"></script>
 		<script src="bower_components/backbone/backbone.js"></script>
 		<script src="bower_components/backbone.localStorage/backbone.localStorage.js"></script>
+		<script src="js/models/deletedTodo.js"></script>
+		<script src="js/collections/deletedTodos.js"></script>
 		<script src="js/models/todo.js"></script>
 		<script src="js/collections/todos.js"></script>
 		<script src="js/views/todo-view.js"></script>
