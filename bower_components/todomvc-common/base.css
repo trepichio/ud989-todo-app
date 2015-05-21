@@ -132,7 +132,8 @@ input[type="checkbox"] {
 
 #priority + label div:after {
 	cursor: pointer;
-	content: '!';
+	content: '\002691';
+	font-family: 'Segoe UI Symbol';
 }
 
 #priority:checked + label div:after {
@@ -306,7 +307,9 @@ label[for='toggle-all'] {
 }
 
 #todo-list li .priority-btn:after {
-	content: '!';
+	content: '\002691';
+	font-family: 'Segoe UI Symbol';
+	font-size: 0.75em;
 }
 
 #todo-list li input[type="checkbox"] {
